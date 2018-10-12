@@ -3,4 +3,5 @@
 export(conv_jc2ad)
 export(read_csvfile)
 importFrom(data.table,fread)
+importFrom(magrittr,"%>%")
 importFrom(stringr,str_match)
