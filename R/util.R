@@ -3,6 +3,7 @@
 #' @param gengou_year gengou is strings in multibite charactor
 #'      which represents year name of Japanese Calender
 #' @importFrom stringr str_match
+#' @importFrom magrittr %>%
 #' @return integer or NA if can't find proper gengou, this function return NA
 #' @export
 #'
@@ -27,7 +28,7 @@ conv_jc2ad <- function(gengou_year){
 #'
 #' @param gengou gengou is strings in multibite charactor which represents
 #'    year name of Japanese Calender
-#' @param first_year what AD year a first year of Japanese calendar is 
+#' @param first_year what AD year a first year of Japanese calendar is
 #' @importFrom stringr str_match
 #' @return function jc2ad return convert function which you've set
 #'
@@ -39,7 +40,7 @@ jc2ad_func <- function(gengou, first_year){
     ans_func <- function(input_string){
 
         input_string <- as.character(input_string)
-        
+
         #str <- sub("元年", "1年", input_string)
         str <- sub("\u5143\u5e74", "1\u5e74", input_string)
 
