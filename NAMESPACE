@@ -3,4 +3,7 @@
 export(conv_jc2ad)
 export(read_csvfile)
 importFrom(data.table,fread)
+importFrom(lubridate,days)
+importFrom(lubridate,interval)
+importFrom(lubridate,ymd)
 importFrom(stringr,str_match)
