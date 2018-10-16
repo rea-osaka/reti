@@ -10,4 +10,5 @@ LazyData: true
 RoxygenNote: 6.1.0
 Imports: data.table,
     stringr,
+    lubridate,
     magrittr
