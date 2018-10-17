@@ -38,3 +38,33 @@ make_date_col <- function(date_strings){
 
     return(ans)
 }
+
+#' making how far station cols from original how far col
+#'
+#' @param date_strings vector of transaction how far string
+#'
+make_hfs_col <- function(hfs_strings){
+    tmp <- as.character(hfs_strings)
+    ans <- ifelse(nchar(tmp) > 2, 99, ifelse(tmp == "", NA, tmp))
+    return(as.integer(ans))
+}
+
+#' making how far station category cols from original how far col
+#'
+#' @param date_strings vector of transaction how far string
+#'
+make_hfs_category_col <- function(hfs_strings){
+    ans <- as.character(hfs_strings)
+
+    #ans <- ifelse(ans =="30分?60分", 30, ans)
+    ans <- ifelse(ans =="30\u5206?60\u5206", 30, ans)
+    ans <- ifelse(ans =="1H?1H30", 60, ans)
+    ans <- ifelse(ans =="1H30?2H", 90, ans)
+    ans <- ifelse(ans =="2H?", 120, ans)
+    ans <- ifelse(ans =="", NA, ans)
+
+    ans <- as.integer(ans)
+    ans <- ifelse(0 <= ans & ans < 30, 0, ans)
+
+    return(as.integer(ans))
+}
