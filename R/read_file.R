@@ -59,3 +59,35 @@ read_csvfile <- function(path)
 
     return(df)
 }
+
+#' Making Building and Land data from real estate transaction-price data
+#' 
+#' Makes Building and Land data from csvfiles for real estate 
+#' transaction-price data, which are provied by Ministry of Land,
+#' Infrastructure and Transport (MLIT)
+#' 
+#' @param path vector of csvfile's path. If you give more than two 
+#'        paths as vector, each given data are bound. So you will
+#'        get just one data.frame type data.
+#'
+#' @importFrom stringr str_detect
+#' @importFrom magrittr %>%
+#' @export
+#'
+get_LBdata <- function(path) {
+
+    df <- read_csvfile(path) 
+
+    # date data
+    date_col <- make_date_col(df[[27]])
+
+    # how far station data
+    howfar_col <- make_hfs_col(df[[8]])
+    howfar_category_col <- make_hfs_category_col(df[[8]])
+
+    # area size
+    area_size <- 
+        ifelse(str_detect(df[[12]], "2000"), NA, df[[12]]) %>% as.integer()
+    huge_land <- str_detect(df[[12]], "2000")
+
+}
