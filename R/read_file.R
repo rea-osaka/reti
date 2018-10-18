@@ -69,8 +69,10 @@ read_csvfile <- function(path)
 #' @param path vector of csvfile's path. If you give more than two
 #'        paths as vector, each given data are bound. So you will
 #'        get just one data.frame type data.
-#' @param kind character which represents kind is kind of land, there 
-#'        are four kind of land, residence, urban, factory, unresidence
+#' @param kind string which contains Four character "R" or "C" or "F" or "U";
+#'        each character represents kind of land. There are four kind of land, 
+#'        residence, commrercial, factory and unresidence, which represent
+#'        "R", "C", "F", "U", respectively.
 #' @param timecount logi type. you can see how much time did this function
 #'        take to finish work. 
 #'
@@ -79,9 +81,10 @@ read_csvfile <- function(path)
 #' @importFrom lubridate int_start
 #' @importFrom lubridate days
 #' @importFrom lubridate interval
+#' @importFrom data.table year
 #' @export
 #'
-get_LBdata <- function(path, timecount = FALSE, kind = "\u4f4f\u5b85\u5730") {
+get_LBdata <- function(path, timecount = FALSE, kind = "R") {
     
     # kindの初期値
     # kind = "住宅地"
@@ -105,9 +108,7 @@ get_LBdata <- function(path, timecount = FALSE, kind = "\u4f4f\u5b85\u5730") {
     ###############################
     # choose kind
     ###############################
-    if(kind != ""){
-        df <- subset(df, df[[2]] == kind)
-    }
+    df <- subset_with_kind(df, kind)
 
     ###############################
     # date data

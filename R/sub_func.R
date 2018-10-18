@@ -68,3 +68,42 @@ make_hfs_category_col <- function(hfs_strings){
 
     return(as.integer(ans))
 }
+
+#' subsetting reti data with kind
+#'
+#' @param df data.frame which is made from csvfiles for real estate
+#'    transaction-price data, which are provied by Ministry of Land,
+#'    Infrastructure and Transport (MLIT)
+#' @param kind string which contains Four character "R" or "C" or "F" or "U";
+#'        each character represents kind of land. There are four kind of land, 
+#'        residence, commrercial, factory and unresidence, which represent
+#'        "R", "C", "F", "U", respectively.
+#' @importFrom stringr str_detect
+#' @export
+subset_with_kind <- function(df, kind){
+
+    tmplogi <- FALSE
+
+    if(str_detect(kind, "R")){
+        #tmplogi <- tmplogi or str_detect(df[[2]], "住宅地")
+        tmplogi <- tmplogi | str_detect(df[[2]], "\u4f4f\u5b85\u5730")
+    }
+
+    if(str_detect(kind, "C")){
+        #tmplogi <- tmplogi or str_detect(df[[2]], "商業地")
+        tmplogi <- tmplogi | str_detect(df[[2]], "\u5546\u696d\u5730")
+    }
+
+    if(str_detect(kind, "F")){
+        #tmplogi <- tmplogi or str_detect(df[[2]], "工業地")
+        tmplogi <- tmplogi | str_detect(df[[2]], "\u5de5\u696d\u5730")
+    } 
+
+    if(str_detect(kind, "U")){
+        #tmplogi <- tmplogi or str_detect(df[[2]], "宅地見込地")
+        tmplogi <- tmplogi | str_detect(df[[2]], "\u5b85\u5730\u898b\u8fbc\u5730")
+    }
+
+    ans <- subset(df, tmplogi)
+    return(ans)
+}
