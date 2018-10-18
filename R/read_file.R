@@ -1,10 +1,10 @@
 #' Read csvfiles for real estate transaction-price data
-#' 
-#' Reads csvfiles for real estate transaction-price data, which are 
+#'
+#' Reads csvfiles for real estate transaction-price data, which are
 #' provied by Ministry of Land, Infrastructure and Transport (MLIT),
 #' and Returns a data.frame type data.
-#' 
-#' @param path vector of csvfile's path. If you give more than two 
+#'
+#' @param path vector of csvfile's path. If you give more than two
 #'        paths as vector, each given data are bound. So you will
 #'        get just one data.frame type data.
 #'
@@ -19,11 +19,11 @@ read_csvfile <- function(path)
     df <- do.call(rbind, dfs)
 
     df <- df[,-1]
-    
+
     # データの列名を決定
 
     #####################################
-    # deciding col names 
+    # deciding col names
     #####################################
     col_name <- c("\u7a2e\u985e",              # 1  種類
                   "\u5730\u57df",              # 2  地域
@@ -58,4 +58,129 @@ read_csvfile <- function(path)
     names(df) <- col_name
 
     return(df)
+}
+
+#' Making Building and Land data from real estate transaction-price infomation data
+#'
+#' Makes Building and Land data from csvfiles for real estate
+#' transaction-price data, which are provied by Ministry of Land,
+#' Infrastructure and Transport (MLIT)
+#'
+#' @param path vector of csvfile's path. If you give more than two
+#'        paths as vector, each given data are bound. So you will
+#'        get just one data.frame type data.
+#' @param kind character which represents kind is kind of land, there 
+#'        are four kind of land, residence, urban, factory, unresidence
+#' @param timecount logi type. you can see how much time did this function
+#'        take to finish work. 
+#'
+#' @importFrom stringr str_detect
+#' @importFrom lubridate ymd
+#' @importFrom lubridate int_start
+#' @importFrom lubridate days
+#' @importFrom lubridate interval
+#' @export
+#'
+get_LBdata <- function(path, timecount = FALSE, kind = "\u4f4f\u5b85\u5730") {
+    
+    # kindの初期値
+    # kind = "住宅地"
+
+    ###############################
+    # counting time 
+    ###############################
+    t_start <-proc.time()
+
+    ###############################
+    # read csvfile 
+    ###############################
+    df <- read_csvfile(path)
+
+    ###############################
+    # choose type
+    ###############################
+    #df <- subset(df, df[[1]] == "宅地(土地と建物)")
+    df <- subset(df, df[[1]] == "\u5b85\u5730(\u571f\u5730\u3068\u5efa\u7269)")
+
+    ###############################
+    # choose kind
+    ###############################
+    if(kind != ""){
+        df <- subset(df, df[[2]] == kind)
+    }
+
+    ###############################
+    # date data
+    ###############################
+    date_col <- make_date_col(df[[27]])
+
+
+    ###############################
+    # how far station data
+    ###############################
+    howfar_col <- make_hfs_col(df[[8]])
+    howfar_category_col <- make_hfs_category_col(df[[8]])
+
+
+    ###############################
+    # area size
+    ###############################
+    area_size <- suppressWarnings(as.integer(df[[12]]))
+    huge_land <- str_detect(df[[12]], "2000")
+
+
+    ###############################
+    # floor size
+    ###############################
+    floor_size <- suppressWarnings(as.numeric(df[[16]]))
+
+    #too_small_fsize <- str_detect(df[[16]],"未満")
+    too_small_fsize <- str_detect(df[[16]], "\u672a\u6e80")
+
+    #huge_fsize <- str_detect(df[[16]],"以上")
+    huge_fsize <- str_detect(df[[16]], "\u4ee5\u4e0a")
+
+
+    ###############################
+    # building duration
+    ###############################
+    start <- suppressWarnings(ymd(paste0(conv_jc2ad(df[[17]]), "0101")))
+    end <- int_start(date_col)
+    building_duration <- interval(start,end)
+    bd_years <- year(end) - year(start)
+    bd_years <- ifelse(bd_years < 0, NA, bd_years)
+
+    #building_before_war <- str_detect(df[[17]], "戦前")
+    building_before_war <- str_detect(df[[17]], "\u6226\u524d")
+
+    ###############################
+    # bind data and make ans 
+    ###############################
+
+    add_df <- data.frame(date_col,
+                         howfar_col,
+                         howfar_category_col,
+                         area_size,
+                         huge_land,
+                         floor_size,
+                         too_small_fsize,
+                         huge_fsize,
+                         building_duration,
+                         bd_years,
+                         building_before_war
+                         )
+
+    ans <- cbind(df, add_df)
+    
+    
+    ###############################
+    # show how much time to have spent 
+    ###############################
+    t_ans <- proc.time() - t_start
+    if(timecount == TRUE){
+        print(t_ans)
+    }
+    
+    return(ans)
+
 }

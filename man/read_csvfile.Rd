@@ -7,12 +7,12 @@
 read_csvfile(path)
 }
 \arguments{
-\item{path}{vector of csvfile's path. If you give more than two 
+\item{path}{vector of csvfile's path. If you give more than two
 paths as vector, each given data are bound. So you will
 get just one data.frame type data.}
 }
 \description{
-Reads csvfiles for real estate transaction-price data, which are 
+Reads csvfiles for real estate transaction-price data, which are
 provied by Ministry of Land, Infrastructure and Transport (MLIT),
 and Returns a data.frame type data.
 }
