@@ -4,7 +4,7 @@
 \alias{get_LBdata}
 \title{Making Building and Land data from real estate transaction-price infomation data}
 \usage{
-get_LBdata(path, timecount = FALSE, kind = "住宅地")
+get_LBdata(path, timecount = FALSE, kind = "R")
 }
 \arguments{
 \item{path}{vector of csvfile's path. If you give more than two
@@ -14,8 +14,10 @@ get just one data.frame type data.}
 \item{timecount}{logi type. you can see how much time did this function
 take to finish work.}
 
-\item{kind}{character which represents kind is kind of land, there 
-are four kind of land, residence, urban, factory, unresidence}
+\item{kind}{string which contains Four character "R" or "C" or "F" or "U";
+each character represents kind of land. There are four kind of land, 
+residence, commrercial, factory and unresidence, which represent
+"R", "C", "F", "U", respectively.}
 }
 \description{
 Makes Building and Land data from csvfiles for real estate
