@@ -2,6 +2,7 @@
 
 export(conv_jc2ad)
 export(get_LBdata)
+export(get_LOdata)
 export(read_csvfile)
 export(subset_with_kind)
 importFrom(data.table,fread)

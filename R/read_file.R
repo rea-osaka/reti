@@ -126,14 +126,14 @@ get_LBdata <- function(path, timecount = FALSE, kind = "R") {
     ###############################
     # area size
     ###############################
-    area_size <- suppressWarnings(as.integer(df[[12]]))
+    area_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
     huge_land <- str_detect(df[[12]], "2000")
 
 
     ###############################
     # floor size
     ###############################
-    floor_size <- suppressWarnings(as.numeric(df[[16]]))
+    floor_size <- suppressWarnings(as.numeric(as.character(df[[16]])))
 
     #too_small_fsize <- str_detect(df[[16]],"未満")
     too_small_fsize <- str_detect(df[[16]], "\u672a\u6e80")
@@ -169,6 +169,102 @@ get_LBdata <- function(path, timecount = FALSE, kind = "R") {
                          building_duration,
                          bd_years,
                          building_before_war
+                         )
+
+    ans <- cbind(df, add_df)
+    
+    
+    ###############################
+    # show how much time to have spent 
+    ###############################
+    t_ans <- proc.time() - t_start
+    if(timecount == TRUE){
+        print(t_ans)
+    }
+    
+    return(ans)
+
+}
+
+#' Making Land only data from real estate transaction-price infomation data
+#'
+#' Makes Land only data from csvfiles for real estate transaction-price data,
+#' which are provied by Ministry of Land, Infrastructure and Transport (MLIT)
+#'
+#' @param path vector of csvfile's path. If you give more than two
+#'        paths as vector, each given data are bound. So you will
+#'        get just one data.frame type data.
+#' @param kind string which contains Four character "R" or "C" or "F" or "U";
+#'        each character represents kind of land. There are four kind of land, 
+#'        residence, commrercial, factory and unresidence, which represent
+#'        "R", "C", "F", "U", respectively.
+#' @param timecount logi type. you can see how much time did this function
+#'        take to finish work. 
+#'
+#' @importFrom stringr str_detect
+#' @importFrom lubridate ymd
+#' @importFrom lubridate int_start
+#' @importFrom lubridate days
+#' @importFrom lubridate interval
+#' @importFrom data.table year
+#' @export
+#'
+get_LOdata <- function(path, timecount = FALSE, kind = "R") {
+    
+    # kindの初期値
+    # kind = "住宅地"
+
+    ###############################
+    # counting time 
+    ###############################
+    t_start <-proc.time()
+
+    ###############################
+    # read csvfile 
+    ###############################
+    df <- read_csvfile(path)
+
+    ###############################
+    # choose type
+    ###############################
+    #df <- subset(df, df[[1]] == "宅地(土地)")
+    df <- subset(df, df[[1]] == "\u5b85\u5730(\u571f\u5730)")
+
+    ###############################
+    # choose kind
+    ###############################
+    df <- subset_with_kind(df, kind)
+
+    ###############################
+    # date data
+    ###############################
+    date_col <- make_date_col(df[[27]])
+
+
+    ###############################
+    # how far station data
+    ###############################
+    howfar_col <- make_hfs_col(df[[8]])
+    howfar_category_col <- make_hfs_category_col(df[[8]])
+
+
+    ###############################
+    # area size
+    ###############################
+    area_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
+    huge_land <- str_detect(df[[12]], "2000")
+
+    area_size <- ifelse(huge_land, signif( df[[9]] / df[[13]], 2), area_size)
+
+    ###############################
+    # bind data and make ans 
+    ###############################
+
+    add_df <- data.frame(date_col,
+                         howfar_col,
+                         howfar_category_col,
+                         area_size,
+                         huge_land
                          )
 
     ans <- cbind(df, add_df)
