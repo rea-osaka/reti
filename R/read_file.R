@@ -126,14 +126,14 @@ get_LBdata <- function(path, timecount = FALSE, kind = "R") {
     ###############################
     # area size
     ###############################
-    area_size <- suppressWarnings(as.integer(df[[12]]))
+    area_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
     huge_land <- str_detect(df[[12]], "2000")
 
 
     ###############################
     # floor size
     ###############################
-    floor_size <- suppressWarnings(as.numeric(df[[16]]))
+    floor_size <- suppressWarnings(as.numeric(as.character(df[[16]])))
 
     #too_small_fsize <- str_detect(df[[16]],"未満")
     too_small_fsize <- str_detect(df[[16]], "\u672a\u6e80")
@@ -251,9 +251,10 @@ get_LOdata <- function(path, timecount = FALSE, kind = "R") {
     ###############################
     # area size
     ###############################
-    area_size <- suppressWarnings(as.integer(df[[12]]))
+    area_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
     huge_land <- str_detect(df[[12]], "2000")
 
+    area_size <- ifelse(huge_land, signif( df[[9]] / df[[13]], 2), area_size)
 
     ###############################
     # bind data and make ans 
