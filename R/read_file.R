@@ -281,3 +281,116 @@ get_LOdata <- function(path, timecount = FALSE, kind = "R") {
     return(ans)
 
 }
+
+#' Making apartment data from real estate transaction-price infomation data
+#'
+#' Makes apartment data from csvfiles for real estate
+#' transaction-price data, which are provied by Ministry of Land,
+#' Infrastructure and Transport (MLIT)
+#'
+#' @param path vector of csvfile's path. If you give more than two
+#'        paths as vector, each given data are bound. So you will
+#'        get just one data.frame type data.
+#' @param timecount logi type. you can see how much time did this function
+#'        take to finish work. 
+#'
+#' @importFrom stringr str_detect
+#' @importFrom lubridate ymd
+#' @importFrom lubridate int_start
+#' @importFrom lubridate days
+#' @importFrom lubridate interval
+#' @importFrom data.table year
+#' @export
+#'
+get_Mdata <- function(path, timecount = FALSE) {
+    
+    ###############################
+    # counting time 
+    ###############################
+    t_start <-proc.time()
+
+    ###############################
+    # read csvfile 
+    ###############################
+    df <- read_csvfile(path)
+
+    ###############################
+    # choose type
+    ###############################
+    #df <- subset(df, df[[1]] == "中古マンション等")
+    df <- subset(df, df[[1]] == "\u4e2d\u53e4\u30de\u30f3\u30b7\u30e7\u30f3\u7b49")
+
+    ###############################
+    # date data
+    ###############################
+    date_col <- make_date_col(df[[27]])
+
+    ###############################
+    # how far station data
+    ###############################
+    howfar_col <- make_hfs_col(df[[8]])
+    howfar_category_col <- make_hfs_category_col(df[[8]])
+
+    ###############################
+    # area size
+    ###############################
+    area_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
+    huge_land <- str_detect(df[[12]], "2000")
+
+
+    ###############################
+    # floor size
+    ###############################
+    floor_size <- suppressWarnings(as.numeric(as.character(df[[16]])))
+
+    #too_small_fsize <- str_detect(df[[16]],"未満")
+    too_small_fsize <- str_detect(df[[16]], "\u672a\u6e80")
+
+    #huge_fsize <- str_detect(df[[16]],"以上")
+    huge_fsize <- str_detect(df[[16]], "\u4ee5\u4e0a")
+
+
+    ###############################
+    # building duration
+    ###############################
+    start <- suppressWarnings(ymd(paste0(conv_jc2ad(df[[17]]), "0101")))
+    end <- int_start(date_col)
+    building_duration <- interval(start,end)
+    bd_years <- year(end) - year(start)
+    bd_years <- ifelse(bd_years < 0, NA, bd_years)
+
+    #building_before_war <- str_detect(df[[17]], "戦前")
+    building_before_war <- str_detect(df[[17]], "\u6226\u524d")
+
+    ###############################
+    # bind data and make ans 
+    ###############################
+
+    add_df <- data.frame(date_col,
+                         howfar_col,
+                         howfar_category_col,
+                         area_size,
+                         huge_land,
+                         floor_size,
+                         too_small_fsize,
+                         huge_fsize,
+                         building_duration,
+                         bd_years,
+                         building_before_war
+                         )
+
+    ans <- cbind(df, add_df)
+    
+    
+    ###############################
+    # show how much time to have spent 
+    ###############################
+    t_ans <- proc.time() - t_start
+    if(timecount == TRUE){
+        print(t_ans)
+    }
+    
+    return(ans)
+
+}
+
