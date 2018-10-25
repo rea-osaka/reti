@@ -149,7 +149,7 @@ get_LBdata <- function(path, timecount = FALSE, kind = "R") {
     end <- int_start(date_col)
     building_duration <- interval(start,end)
     bd_years <- year(end) - year(start)
-    bd_years <- ifelse(bd_years < 0, NA, bd_years)
+    # bd_years <- ifelse(bd_years < 0, NA, bd_years)
 
     #building_before_war <- str_detect(df[[17]], "戦前")
     building_before_war <- str_detect(df[[17]], "\u6226\u524d")
@@ -334,20 +334,8 @@ get_Mdata <- function(path, timecount = FALSE) {
     ###############################
     # area size
     ###############################
-    area_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
-    huge_land <- str_detect(df[[12]], "2000")
-
-
-    ###############################
-    # floor size
-    ###############################
-    floor_size <- suppressWarnings(as.numeric(as.character(df[[16]])))
-
-    #too_small_fsize <- str_detect(df[[16]],"未満")
-    too_small_fsize <- str_detect(df[[16]], "\u672a\u6e80")
-
-    #huge_fsize <- str_detect(df[[16]],"以上")
-    huge_fsize <- str_detect(df[[16]], "\u4ee5\u4e0a")
+    room_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
+    huge_room <- str_detect(df[[12]], "2000")
 
 
     ###############################
@@ -357,7 +345,7 @@ get_Mdata <- function(path, timecount = FALSE) {
     end <- int_start(date_col)
     building_duration <- interval(start,end)
     bd_years <- year(end) - year(start)
-    bd_years <- ifelse(bd_years < 0, NA, bd_years)
+    # bd_years <- ifelse(bd_years < 0, NA, bd_years)
 
     #building_before_war <- str_detect(df[[17]], "戦前")
     building_before_war <- str_detect(df[[17]], "\u6226\u524d")
@@ -369,14 +357,80 @@ get_Mdata <- function(path, timecount = FALSE) {
     add_df <- data.frame(date_col,
                          howfar_col,
                          howfar_category_col,
-                         area_size,
-                         huge_land,
-                         floor_size,
-                         too_small_fsize,
-                         huge_fsize,
+                         room_size,
+                         huge_room,
                          building_duration,
                          bd_years,
                          building_before_war
+                         )
+
+    ans <- cbind(df, add_df)
+    
+    
+    ###############################
+    # show how much time to have spent 
+    ###############################
+    t_ans <- proc.time() - t_start
+    if(timecount == TRUE){
+        print(t_ans)
+    }
+    
+    return(ans)
+
+}
+
+#' Making farm and woods data from real estate transaction-price infomation data
+#'
+#' Makes farm and woods data from csvfiles for real estate
+#' transaction-price data, which are provied by Ministry of Land,
+#' Infrastructure and Transport (MLIT)
+#'
+#' @param path vector of csvfile's path. If you give more than two
+#'        paths as vector, each given data are bound. So you will
+#'        get just one data.frame type data.
+#' @param timecount logi type. you can see how much time did this function
+#'        take to finish work. 
+#'
+#' @importFrom stringr str_detect
+#' @export
+#'
+get_FWdata <- function(path, timecount = FALSE) {
+    
+    ###############################
+    # counting time 
+    ###############################
+    t_start <-proc.time()
+
+    ###############################
+    # read csvfile 
+    ###############################
+    df <- read_csvfile(path)
+
+    ###############################
+    # choose type
+    ###############################
+    #df <- subset(df, df[[1]] == "農地" | df[[1]] == "林地")
+    df <- subset(df, df[[1]] == "\u8fb2\u5730" | df[[1]] == "\u6797\u5730")
+
+    ###############################
+    # date data
+    ###############################
+    date_col <- make_date_col(df[[27]])
+
+    ###############################
+    # area size
+    ###############################
+    area_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
+    huge_area <- str_detect(df[[12]], "5000")
+
+
+    ###############################
+    # bind data and make ans 
+    ###############################
+
+    add_df <- data.frame(date_col,
+                         area_size,
+                         huge_area
                          )
 
     ans <- cbind(df, add_df)
