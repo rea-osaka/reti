@@ -78,26 +78,24 @@ read_csvfile <- function(path)
 #'
 #' @importFrom stringr str_detect
 #' @importFrom lubridate ymd
-#' @importFrom lubridate int_start
-#' @importFrom lubridate days
-#' @importFrom lubridate interval
 #' @importFrom data.table year
 #' @export
 #'
-get_LBdata <- function(path, timecount = FALSE, kind = "R") {
+get_LBdata <- function(path, timecount = FALSE, kind = "RCFU") {
     
-    # kindの初期値
-    # kind = "住宅地"
+    # kindの初期値は全ての種別
 
     ###############################
     # counting time 
     ###############################
     t_start <-proc.time()
 
+
     ###############################
     # read csvfile 
     ###############################
     df <- read_csvfile(path)
+
 
     ###############################
     # choose type
@@ -105,69 +103,74 @@ get_LBdata <- function(path, timecount = FALSE, kind = "R") {
     #df <- subset(df, df[[1]] == "宅地(土地と建物)")
     df <- subset(df, df[[1]] == "\u5b85\u5730(\u571f\u5730\u3068\u5efa\u7269)")
 
+
     ###############################
     # choose kind
     ###############################
     df <- subset_with_kind(df, kind)
 
+
     ###############################
     # date data
     ###############################
-    date_col <- make_date_col(df[[27]])
+    # 27 -> 取引時点
+    t_date <- make_date_col(df[[27]])
 
 
     ###############################
     # how far station data
     ###############################
-    howfar_col <- make_hfs_col(df[[8]])
-    howfar_category_col <- make_hfs_category_col(df[[8]])
+    # 8 -> 駅分
+    howfar_st <- make_hfs_col(df[[8]])
+    howfar_st_category <- make_hfs_category_col(df[[8]])
 
 
     ###############################
-    # area size
+    # land size
     ###############################
-    area_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
+    # 12 -> 面積 
+    land_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
     huge_land <- str_detect(df[[12]], "2000")
 
 
     ###############################
-    # floor size
+    # building size
     ###############################
-    floor_size <- suppressWarnings(as.numeric(as.character(df[[16]])))
+    # 16 -> 延床面積 
+    building_size <- suppressWarnings(as.numeric(as.character(df[[16]])))
 
     #too_small_fsize <- str_detect(df[[16]],"未満")
-    too_small_fsize <- str_detect(df[[16]], "\u672a\u6e80")
+    small_building <- str_detect(df[[16]], "\u672a\u6e80")
 
     #huge_fsize <- str_detect(df[[16]],"以上")
-    huge_fsize <- str_detect(df[[16]], "\u4ee5\u4e0a")
+    huge_building <- str_detect(df[[16]], "\u4ee5\u4e0a")
 
 
     ###############################
-    # building duration
+    # How old is the building
     ###############################
+    # 17 -> 建築年
+    # t_date 取引年
     start <- suppressWarnings(ymd(paste0(conv_jc2ad(df[[17]]), "0101")))
-    end <- int_start(date_col)
-    building_duration <- interval(start,end)
-    bd_years <- year(end) - year(start)
-    # bd_years <- ifelse(bd_years < 0, NA, bd_years)
+    end <- t_date
+    howold_building <- year(end) - year(start)
 
     #building_before_war <- str_detect(df[[17]], "戦前")
     building_before_war <- str_detect(df[[17]], "\u6226\u524d")
 
+
     ###############################
     # bind data and make ans 
     ###############################
-
-    add_df <- data.frame(date_col,
-                         howfar_col,
-                         howfar_category_col,
-                         area_size,
+    add_df <- data.frame(t_date,
+                         howfar_st,
+                         howfar_st_category,
+                         land_size,
                          huge_land,
-                         floor_size,
-                         too_small_fsize,
-                         huge_fsize,
-                         building_duration,
-                         bd_years,
+                         building_size,
+                         small_building,
+                         huge_building,
+                         howold_building,
                          building_before_war
                          )
 
@@ -203,26 +206,24 @@ get_LBdata <- function(path, timecount = FALSE, kind = "R") {
 #'
 #' @importFrom stringr str_detect
 #' @importFrom lubridate ymd
-#' @importFrom lubridate int_start
-#' @importFrom lubridate days
-#' @importFrom lubridate interval
 #' @importFrom data.table year
 #' @export
 #'
-get_LOdata <- function(path, timecount = FALSE, kind = "R") {
+get_LOdata <- function(path, timecount = FALSE, kind = "RCFU") {
     
-    # kindの初期値
-    # kind = "住宅地"
+    # kindの初期値 全部
 
     ###############################
     # counting time 
     ###############################
     t_start <-proc.time()
 
+
     ###############################
     # read csvfile 
     ###############################
     df <- read_csvfile(path)
+
 
     ###############################
     # choose type
@@ -230,40 +231,47 @@ get_LOdata <- function(path, timecount = FALSE, kind = "R") {
     #df <- subset(df, df[[1]] == "宅地(土地)")
     df <- subset(df, df[[1]] == "\u5b85\u5730(\u571f\u5730)")
 
+
     ###############################
     # choose kind
     ###############################
     df <- subset_with_kind(df, kind)
 
+
     ###############################
     # date data
     ###############################
-    date_col <- make_date_col(df[[27]])
+    # 27 -> 取引時点
+    t_date <- make_date_col(df[[27]])
 
 
     ###############################
     # how far station data
     ###############################
-    howfar_col <- make_hfs_col(df[[8]])
-    howfar_category_col <- make_hfs_category_col(df[[8]])
+    # 8 -> 駅分
+    howfar_st <- make_hfs_col(df[[8]])
+    howfar_st_category <- make_hfs_category_col(df[[8]])
 
 
     ###############################
-    # area size
+    # land size
     ###############################
-    area_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
+    # 12 -> 面積 
+    # 9 -> 取引総額
+    # 13 -> 土地単価
+    land_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
     huge_land <- str_detect(df[[12]], "2000")
 
-    area_size <- ifelse(huge_land, signif( df[[9]] / df[[13]], 2), area_size)
+    land_size <- ifelse(huge_land, signif( df[[9]] / df[[13]], 2), land_size)
 
     ###############################
     # bind data and make ans 
     ###############################
 
-    add_df <- data.frame(date_col,
-                         howfar_col,
-                         howfar_category_col,
-                         area_size,
+    add_df <- data.frame(t_date,
+                         howfar_st,
+                         howfar_st_category,
+                         land_size,
                          huge_land
                          )
 
@@ -296,9 +304,6 @@ get_LOdata <- function(path, timecount = FALSE, kind = "R") {
 #'
 #' @importFrom stringr str_detect
 #' @importFrom lubridate ymd
-#' @importFrom lubridate int_start
-#' @importFrom lubridate days
-#' @importFrom lubridate interval
 #' @importFrom data.table year
 #' @export
 #'
@@ -309,10 +314,12 @@ get_Mdata <- function(path, timecount = FALSE) {
     ###############################
     t_start <-proc.time()
 
+
     ###############################
     # read csvfile 
     ###############################
     df <- read_csvfile(path)
+
 
     ###############################
     # choose type
@@ -320,47 +327,53 @@ get_Mdata <- function(path, timecount = FALSE) {
     #df <- subset(df, df[[1]] == "中古マンション等")
     df <- subset(df, df[[1]] == "\u4e2d\u53e4\u30de\u30f3\u30b7\u30e7\u30f3\u7b49")
 
+
     ###############################
     # date data
     ###############################
-    date_col <- make_date_col(df[[27]])
+    # 27 -> 取引時点
+    t_date <- make_date_col(df[[27]])
+
 
     ###############################
     # how far station data
     ###############################
-    howfar_col <- make_hfs_col(df[[8]])
-    howfar_category_col <- make_hfs_category_col(df[[8]])
+    # 8 -> 駅分
+    howfar_st <- make_hfs_col(df[[8]])
+    howfar_st_category <- make_hfs_category_col(df[[8]])
+
 
     ###############################
     # area size
     ###############################
+    # 12 -> 面積 
     room_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
     huge_room <- str_detect(df[[12]], "2000")
 
 
     ###############################
-    # building duration
+    # How old is the building
     ###############################
+    # 17 -> 建築年
+    # t_date 取引年
     start <- suppressWarnings(ymd(paste0(conv_jc2ad(df[[17]]), "0101")))
-    end <- int_start(date_col)
-    building_duration <- interval(start,end)
-    bd_years <- year(end) - year(start)
-    # bd_years <- ifelse(bd_years < 0, NA, bd_years)
+    end <- t_date
+    howold_building <- year(end) - year(start)
 
     #building_before_war <- str_detect(df[[17]], "戦前")
     building_before_war <- str_detect(df[[17]], "\u6226\u524d")
+
 
     ###############################
     # bind data and make ans 
     ###############################
 
-    add_df <- data.frame(date_col,
-                         howfar_col,
-                         howfar_category_col,
+    add_df <- data.frame(t_date,
+                         howfar_st,
+                         howfar_st_category,
                          room_size,
                          huge_room,
-                         building_duration,
-                         bd_years,
+                         howold_building,
                          building_before_war
                          )
 
@@ -415,22 +428,24 @@ get_FWdata <- function(path, timecount = FALSE) {
     ###############################
     # date data
     ###############################
-    date_col <- make_date_col(df[[27]])
+    # 27 -> 取引時点
+    t_date <- make_date_col(df[[27]])
 
     ###############################
     # area size
     ###############################
-    area_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
-    huge_area <- str_detect(df[[12]], "5000")
+    # 12 -> 面積 
+    land_size <- suppressWarnings(as.numeric(as.character(df[[12]])))
+    huge_land <- str_detect(df[[12]], "5000")
 
 
     ###############################
     # bind data and make ans 
     ###############################
 
-    add_df <- data.frame(date_col,
-                         area_size,
-                         huge_area
+    add_df <- data.frame(t_date,
+                         land_size,
+                         huge_land
                          )
 
     ans <- cbind(df, add_df)

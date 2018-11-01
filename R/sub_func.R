@@ -4,9 +4,6 @@
 #'
 #' @importFrom stringr str_match
 #' @importFrom lubridate ymd
-#' @importFrom lubridate days
-#' @importFrom lubridate interval
-
 make_date_col <- function(date_strings){
 
     # df$取引時点
@@ -31,11 +28,8 @@ make_date_col <- function(date_strings){
         }
     }
 
-    start <- ymd(ans)
-    end <- start + months(3) - days(1)
+    ans <- ymd(ans)
     
-    ans <- interval(start,end) 
-
     return(ans)
 }
 
