@@ -4,7 +4,7 @@
 \alias{get_LOdata}
 \title{Making Land only data from real estate transaction-price infomation data}
 \usage{
-get_LOdata(path, timecount = FALSE, kind = "R")
+get_LOdata(path, timecount = FALSE, kind = "RCFU")
 }
 \arguments{
 \item{path}{vector of csvfile's path. If you give more than two

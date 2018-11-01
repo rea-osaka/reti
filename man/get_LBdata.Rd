@@ -4,7 +4,7 @@
 \alias{get_LBdata}
 \title{Making Building and Land data from real estate transaction-price infomation data}
 \usage{
-get_LBdata(path, timecount = FALSE, kind = "R")
+get_LBdata(path, timecount = FALSE, kind = "RCFU")
 }
 \arguments{
 \item{path}{vector of csvfile's path. If you give more than two
