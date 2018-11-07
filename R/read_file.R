@@ -13,7 +13,7 @@
 #'
 read_csvfile <- function(path)
 {
-    dfs <- lapply(path, fread, integer64="numeric", data.table=FALSE,
+    dfs <- lapply(path, read.csv, 
                   stringsAsFactors=TRUE, na.strings = c("","NULL"))
 
     df <- do.call(rbind, dfs)
