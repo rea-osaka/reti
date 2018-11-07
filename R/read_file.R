@@ -8,12 +8,12 @@
 #'        paths as vector, each given data are bound. So you will
 #'        get just one data.frame type data.
 #'
-#' @importFrom data.table fread
 #' @export
 #'
+# @importFrom read.csv utils
 read_csvfile <- function(path)
 {
-    dfs <- lapply(path, fread, integer64="numeric", data.table=FALSE,
+    dfs <- lapply(path, utils::read.csv, 
                   stringsAsFactors=TRUE, na.strings = c("","NULL"))
 
     df <- do.call(rbind, dfs)
