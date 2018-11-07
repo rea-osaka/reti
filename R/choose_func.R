@@ -25,6 +25,7 @@ reti_extract_func <- function(df, favorite, index){
 #'
 #' @param df source data.frame
 #' @param cities vector of favorite city names
+#' @export
 #'
 reti_extract_by_city <- function(df, cities){
     # 市名 -> 5
@@ -35,6 +36,7 @@ reti_extract_by_city <- function(df, cities){
 #'
 #' @param df source data.frame
 #' @param prefectures vector of favorite prefecture names
+#' @export
 #'
 reti_extract_by_prefecture <- function(df, prefectures){
     # 県名 -> 4
@@ -45,6 +47,7 @@ reti_extract_by_prefecture <- function(df, prefectures){
 #'
 #' @param df source data.frame
 #' @param station vector of favorite station names
+#' @export
 #'
 reti_extract_by_station <- function(df, stations){
     # 駅名 -> 7
