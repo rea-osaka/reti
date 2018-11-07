@@ -13,7 +13,7 @@
 # @importFrom read.csv utils
 read_csvfile <- function(path)
 {
-    dfs <- lapply(path, utils::read.csv, 
+    dfs <- lapply(path, utils::read.csv, fileEncoding = "cp932",
                   stringsAsFactors=TRUE, na.strings = c("","NULL"))
 
     df <- do.call(rbind, dfs)
