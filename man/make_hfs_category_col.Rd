@@ -7,7 +7,7 @@
 make_hfs_category_col(hfs_strings)
 }
 \arguments{
-\item{date_strings}{vector of transaction how far string}
+\item{hfs_strings}{Vector of how far string.}
 }
 \description{
 making how far station category cols from original how far col

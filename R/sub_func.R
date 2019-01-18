@@ -1,16 +1,13 @@
 #' making date cols from original date col
 #'
-#' @param date_strings vector of transaction date string
-#'
-#' @importFrom stringr str_match
-#' @importFrom lubridate ymd
+#' @param date_strings Vector of transaction date string.
 make_date_col <- function(date_strings){
 
     # df$取引時点
     # 形式は「平成[0-9]{2}年第[１２３４]四半期」
 
     ad  <- conv_jc2ad(date_strings)
-    qtr <- str_match(date_strings, "\u7b2c(.)\u56db\u534a\u671f")[,2]
+    qtr <- stringr::str_match(date_strings, "\u7b2c(.)\u56db\u534a\u671f")[,2]
     ans <- numeric(length(ad))
 
     for( i in 1:length(ans)){
@@ -28,15 +25,14 @@ make_date_col <- function(date_strings){
         }
     }
 
-    ans <- ymd(ans)
+    ans <- lubridate::ymd(ans)
     
     return(ans)
 }
 
 #' making how far station cols from original how far col
 #'
-#' @param date_strings vector of transaction how far string
-#'
+#' @param hfs_strings Vector of how far string.
 make_hfs_col <- function(hfs_strings){
     tmp <- as.character(hfs_strings)
     ans <- ifelse(nchar(tmp) > 2, 99, ifelse(tmp == "", NA, tmp))
@@ -45,8 +41,7 @@ make_hfs_col <- function(hfs_strings){
 
 #' making how far station category cols from original how far col
 #'
-#' @param date_strings vector of transaction how far string
-#'
+#' @param hfs_strings Vector of how far string.
 make_hfs_category_col <- function(hfs_strings){
     ans <- as.character(hfs_strings)
 

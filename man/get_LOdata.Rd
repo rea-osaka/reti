@@ -15,7 +15,7 @@ get just one data.frame type data.}
 take to finish work.}
 
 \item{kind}{string which contains Four character "R" or "C" or "F" or "U";
-each character represents kind of land. There are four kind of land, 
+each character represents kind of land. There are four kind of land,
 residence, commrercial, factory and unresidence, which represent
 "R", "C", "F", "U", respectively.}
 }

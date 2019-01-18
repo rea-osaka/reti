@@ -38,3 +38,4 @@ rsconnect/
 *~
 *.swp
 .Rproj.user
+/tmp/

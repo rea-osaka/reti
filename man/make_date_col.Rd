@@ -7,7 +7,7 @@
 make_date_col(date_strings)
 }
 \arguments{
-\item{date_strings}{vector of transaction date string}
+\item{date_strings}{Vector of transaction date string.}
 }
 \description{
 making date cols from original date col
