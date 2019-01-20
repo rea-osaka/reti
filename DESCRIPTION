@@ -1,15 +1,16 @@
 Package: reti
-Title: Utility to handle real estate transaction-price infomation data 
-Version: 0.3.0
+Title: Utility to handle real estate transaction price infomation data 
+Version: 0.4.0
 Authors@R: person("Syunsuke", "Fukuda", email = "syunsuke.fukuda@gmail.com", role = c("aut", "cre"))
 Description: Utility to handle real estate transaction-price infomation data.
-Depends: R (>= 3.5.1)
+Depends: R (>= 3.5)
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 6.1.1
 Imports: 
-    data.table,
     stringr,
     lubridate,
+    dplyr,
+    readr,
     magrittr

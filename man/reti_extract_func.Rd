@@ -7,7 +7,7 @@
 reti_extract_func(df, favorite, index)
 }
 \arguments{
-\item{df}{source data.frame}
+\item{df}{A reti data}
 
 \item{favorite}{vector of favorite data}
 
