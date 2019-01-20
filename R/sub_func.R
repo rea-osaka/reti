@@ -30,21 +30,19 @@ make_date_col <- function(date_strings){
     return(ans)
 }
 
-#' making how far station cols from original how far col
+#' adding col of howfar_st and howfar_st_category
 #'
-#' @param hfs_strings Vector of how far string.
-make_hfs_col <- function(hfs_strings){
+#' @param df A data which has reti data.
+add_cols_station <- function(df){
+
+    hfs_strings <- df[[8]]
     tmp <- as.character(hfs_strings)
+
+    # 30分未満の数値を取り出す処理
     ans <- ifelse(nchar(tmp) > 2, 99, ifelse(tmp == "", NA, tmp))
-    return(as.integer(ans))
-}
+    hfs <- as.integer(ans)
 
-#' making how far station category cols from original how far col
-#'
-#' @param hfs_strings Vector of how far string.
-make_hfs_category_col <- function(hfs_strings){
-    ans <- as.character(hfs_strings)
-
+    # カテゴリ分けする処理
     #ans <- ifelse(ans =="30分?60分", 30, ans)
     ans <- ifelse(ans =="30\u5206?60\u5206", 30, ans)
     ans <- ifelse(ans =="1H?1H30", 60, ans)
@@ -55,44 +53,52 @@ make_hfs_category_col <- function(hfs_strings){
     ans <- as.integer(ans)
     ans <- ifelse(0 <= ans & ans < 30, 0, ans)
 
-    return(as.integer(ans))
+    hfs_c <- ans
+
+
+    # 列を追加する
+    df <- dplyr::mutate(df,
+                        howfar_st = hfs,
+                        howfar_st_category = hfs_c
+                        )
+
+    return(df)
 }
 
-#' subsetting reti data with kind
+#' adding col of land_size and huge_land
 #'
-#' @param df data.frame which is made from csvfiles for real estate
-#'    transaction-price data, which are provied by Ministry of Land,
-#'    Infrastructure and Transport (MLIT)
-#' @param kind string which contains Four character "R" or "C" or "F" or "U";
-#'        each character represents kind of land. There are four kind of land, 
-#'        residence, commrercial, factory and unresidence, which represent
-#'        "R", "C", "F", "U", respectively.
-#' @importFrom stringr str_detect
-#' @export
-subset_with_kind <- function(df, kind){
+#' @param df A data which has reti data.
+#' @param ptn A pattern string which is considered as huge
+add_cols_landsize <- function(df, ptn){
 
-    tmplogi <- FALSE
+    # 12 -> 面積
+    df <- dplyr::mutate(df,
+                        land_size = suppressWarnings(as.numeric(as.character(df[[12]]))),
+                        huge_land = stringr::str_detect(df[[12]], ptn)
+                        )
 
-    if(str_detect(kind, "R")){
-        #tmplogi <- tmplogi or str_detect(df[[2]], "住宅地")
-        tmplogi <- tmplogi | str_detect(df[[2]], "\u4f4f\u5b85\u5730")
-    }
-
-    if(str_detect(kind, "C")){
-        #tmplogi <- tmplogi or str_detect(df[[2]], "商業地")
-        tmplogi <- tmplogi | str_detect(df[[2]], "\u5546\u696d\u5730")
-    }
-
-    if(str_detect(kind, "F")){
-        #tmplogi <- tmplogi or str_detect(df[[2]], "工業地")
-        tmplogi <- tmplogi | str_detect(df[[2]], "\u5de5\u696d\u5730")
-    } 
-
-    if(str_detect(kind, "U")){
-        #tmplogi <- tmplogi or str_detect(df[[2]], "宅地見込地")
-        tmplogi <- tmplogi | str_detect(df[[2]], "\u5b85\u5730\u898b\u8fbc\u5730")
-    }
-
-    ans <- subset(df, tmplogi)
-    return(ans)
+    return(df)
 }
+
+#' adding col of howold_building and uilding_before_war
+#'
+#' @param df A data which has reti data.
+add_cols_building <- function(df){
+
+    ###############################
+    # How old is the building
+    ###############################
+    # 17 -> 建築年
+    start <- suppressWarnings(lubridate::ymd(paste0(conv_jc2ad(df[[17]]), "0101")))
+    end <- df$t_date
+
+    df <- dplyr::mutate(df,
+                        howold_building = lubridate::year(end) - lubridate::year(start),
+                        building_before_war = stringr::str_detect(df[[17]], "\u6226\u524d") #"戦前"
+                        )
+    return(df)
+}
+
+
+
+

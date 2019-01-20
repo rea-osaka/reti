@@ -2,11 +2,8 @@
 #'
 #' @param gengou_year gengou is strings in multibite charactor
 #'      which represents year name of Japanese Calender
-#' @importFrom stringr str_match
 #' @importFrom magrittr %>%
 #' @return integer or NA if can't find proper gengou, this function return NA
-#' @export
-#'
 conv_jc2ad <- function(gengou_year){
 
     ###################################################
@@ -18,7 +15,7 @@ conv_jc2ad <- function(gengou_year){
     ans <- gengou_year %>% syouwa2ad %>% heisei2ad
 
     # if cant conv, I puts NA
-    tmp <- str_match(ans, "^\\d+$")
+    tmp <- stringr::str_match(ans, "^\\d+$")
     ans <- ifelse(is.na(tmp[,1]), NA, as.integer(tmp[,1]))
 
     return(ans)
@@ -29,9 +26,7 @@ conv_jc2ad <- function(gengou_year){
 #' @param gengou gengou is strings in multibite charactor which represents
 #'    year name of Japanese Calender
 #' @param first_year what AD year a first year of Japanese calendar is
-#' @importFrom stringr str_match
 #' @return function jc2ad return convert function which you've set
-#'
 jc2ad_func <- function(gengou, first_year){
 
     # "元号(.+)年"でマッチ
@@ -44,7 +39,7 @@ jc2ad_func <- function(gengou, first_year){
         #str <- sub("元年", "1年", input_string)
         str <- sub("\u5143\u5e74", "1\u5e74", input_string)
 
-        tmp <- str_match(str, pattern)
+        tmp <- stringr::str_match(str, pattern)
         ans <- ifelse(is.na(tmp[,1]), input_string,
                       as.integer(tmp[,2]) + first_year - 1)
 
