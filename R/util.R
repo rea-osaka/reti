@@ -14,6 +14,9 @@ conv_jc2ad <- function(gengou_year){
 
     ans <- gengou_year %>% syouwa2ad %>% heisei2ad
 
+    #ans <- stringr::str_remove(ans, "年第.四半期")
+    ans <- stringr::str_remove(ans, "\u5e74\u7b2c.\u56db\u534a\u671f")
+
     # if cant conv, I puts NA
     tmp <- stringr::str_match(ans, "^\\d+$")
     ans <- ifelse(is.na(tmp[,1]), NA, as.integer(tmp[,1]))
