@@ -42,7 +42,10 @@ add_cols_station <- function(df){
     ans <- ifelse(nchar(tmp) > 2, 99, ifelse(tmp == "", NA, tmp))
     hfs <- as.integer(ans)
 
+
     # カテゴリ分けする処理
+    ans <- tmp
+
     #ans <- ifelse(ans =="30分?60分", 30, ans)
     ans <- ifelse(ans =="30\u5206?60\u5206", 30, ans)
     ans <- ifelse(ans =="1H?1H30", 60, ans)
