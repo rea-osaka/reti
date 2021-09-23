@@ -20,11 +20,13 @@ reti_read_kjten <- function(file){
     sub_name_define()
 
 
+
   jirei_fd$`東経` = as.numeric(jirei_fd$`東経`)/10000000
   jirei_fd$`北緯` = as.numeric(jirei_fd$`北緯`)/10000000
 
   # デコード
   jirei_fd$`類型` <- decode_ruikei(jirei_fd$`類型`)
+  jirei_fd$`種別` <- decode_syubetu(jirei_fd$`種別`)
 
   jirei_fd$`方位` <- decode_houi(jirei_fd$`方位`)
   jirei_fd$`別街路１方位` <- decode_houi(jirei_fd$`別街路１方位`)
@@ -36,10 +38,22 @@ reti_read_kjten <- function(file){
   jirei_fd$`街路接面状況` <- decode_setumen(jirei_fd$`街路接面状況`)
   jirei_fd$`用途地域` <- decode_youtochiiki(jirei_fd$`用途地域`)
 
-
-
   # 役に立つ行のみのフィルタリング
-  ans_jirei <- jirei_fd %>% select(-matches("X\\d+"))
+  ans_jirei <-
+    jirei_fd %>%
+    select(-matches("X\\d+")) %>%
+
+  # 追加する列
+    dplyr::mutate(
+      #取引時点相当日の確定
+      t_date = ifelse(is.na(`契約日`) | `契約日` == "",
+                      `登記原因日`,
+                      `契約日`) %>% lubridate::ymd(),
+      address_code = stringr::str_c(`都道府県コード`,`市町村コード`)
+      ) %>%
+
+    # 都道府県、市町村を文字列化
+    dplyr::left_join(local_address_DB, by = "address_code")
 
 
   return(ans_jirei)
@@ -65,6 +79,54 @@ decode_ruikei <- function(int_vector){
     )
   sub_decode_func(int_vector, decode_vector)
 }
+
+# 種別
+decode_syubetu <- function(int_vector){
+
+  # デコード定義
+  decode_vector <-
+    c(
+      "その他",               #0
+      rep("",39),             #1-39
+
+      "",                     #40 たくみ
+      "宅地見込み地",         #41
+      rep("",8),
+
+      rep("",10),             #50-59
+
+      "",                     #60 住宅地
+      "住宅地（高級）",       #61
+      "住宅地（共同）",       #62
+      "住宅地（戸建）",       #63
+      "住宅地（混在）",       #64
+      "住宅地（農家）",       #65
+      "住宅地（別荘その他）", #66
+      "",
+      "",
+      "",
+      "",                     #70 商業地
+      "商業地（高度）",       #71
+      "商業地（オフィス街）", #72
+      "",
+      "商業地（準高度）",     #74
+      "商業地（普通）",       #75
+      "商業地（近隣）",       #76
+      "商業地（路線）",       #77
+      "",
+      "",
+      "",                     #80 工業地
+      "工業地（工場）",       #81
+      "",
+      "",
+      "工業地（家内）",       #84
+      "工業地（流通業務）",   #85
+      ""
+    )
+  sub_decode_func(int_vector, decode_vector)
+}
+
+
 
 # 用途地域
 decode_youtochiiki <- function(int_vector){

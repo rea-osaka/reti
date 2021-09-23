@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 ^tmp$
 ^devtmp$
+^data-raw$

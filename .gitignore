@@ -40,3 +40,6 @@ rsconnect/
 .Rproj.user
 /tmp/
 /devtmp/
+
+/data-raw/*.xls
+/data-raw/*.xlsx
