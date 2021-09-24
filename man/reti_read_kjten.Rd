@@ -7,7 +7,7 @@
 reti_read_kjten(file)
 }
 \arguments{
-\item{file}{}
+\item{file}{csv file of jirei data}
 }
 \value{
 data.frame

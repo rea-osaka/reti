@@ -3,7 +3,7 @@
 #' Read the special jirei data file, which file
 #' someone can allow to use.
 #'
-#' @param file
+#' @param file csv file of jirei data
 #'
 #' @return data.frame
 #' @export
@@ -14,11 +14,14 @@ reti_read_kjten <- function(file){
     # ファイルから読み込み
     readr::read_csv(file = file,
                     col_names = F,
+                    show_col_types = F,
                     locale = readr::locale(encoding = "cp932")) %>%
 
     # 可読性のある名前にリネーム
     sub_name_define()
 
+  jirei_fd$`都道府県コード` = sprintf("%02d",as.numeric(jirei_fd$`都道府県コード`))
+  jirei_fd$`市町村コード` = sprintf("%03d",as.numeric(jirei_fd$`市町村コード`))
 
 
   jirei_fd$`東経` = as.numeric(jirei_fd$`東経`)/10000000
@@ -41,7 +44,7 @@ reti_read_kjten <- function(file){
   # 役に立つ行のみのフィルタリング
   ans_jirei <-
     jirei_fd %>%
-    select(-matches("X\\d+")) %>%
+    dplyr::select(-matches("X\\d+")) %>%
 
   # 追加する列
     dplyr::mutate(
