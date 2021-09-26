@@ -46,7 +46,26 @@ reti_read_kjten <- function(file){
                                   as.character(`登記原因日`)),
       t_date             = lubridate::ymd(t_date),
 
-      address_code       = stringr::str_c(`県コード`,`市区町村コード`)
+      address_code       = stringr::str_c(`県コード`,`市区町村コード`),
+
+      `事情区分`         = decode_jijyou(`事情区分`),
+      `事情有無`         = decode_bool(`事情有無`),
+      `買主`             = decode_toujisyazokusei(`買主`),
+      `売主`             = decode_toujisyazokusei(`売主`),
+
+      `水道`             = decode_suidou(`水道`),
+      `ガス`             = decode_gas(`ガス`),
+      `公共下水道`       = decode_gesui(`公共下水道`),
+
+      `前面道路舗装`     = decode_hosou(`前面道路舗装`),
+      `接面１舗装`       = decode_hosou(`接面１舗装`),
+      `接面２舗装`       = decode_hosou(`接面２舗装`),
+      `接面３舗装`       = decode_hosou(`接面３舗装`),
+
+      `前面道路歩道`     = decode_bool(`前面道路歩道`),
+      `前面道路系統`     = decode_dourokeitou(`前面道路系統`),
+
+
       ) %>%
 
     dplyr::left_join(local_address_DB, by = "address_code")
@@ -59,6 +78,121 @@ reti_read_kjten <- function(file){
 # デーコード用関数
 ###############################################
 
+# ありなし
+decode_bool <- function(int_vector){
+
+  # デコード定義
+  decode_vector <-
+    c(
+      "無",
+      "有"
+    )
+  sub_decode_func(int_vector, decode_vector)
+}
+
+# 舗装
+decode_dourokeitou <- function(int_vector){
+
+  # デコード定義
+  decode_vector <-
+    c(
+      "",
+      "優",
+      "劣",
+      "行き止まり",
+      "普通",
+      "階段"
+    )
+  sub_decode_func(int_vector, decode_vector)
+}
+
+# 舗装
+decode_hosou <- function(int_vector){
+
+  # デコード定義
+  decode_vector <-
+    c(
+      "未舗装",
+      "アスファルト",
+      "コンクリート",
+      "他"
+    )
+  sub_decode_func(int_vector, decode_vector)
+}
+
+
+# 公共下水道
+decode_gesui <- function(int_vector){
+
+  # デコード定義
+  decode_vector <-
+    c(
+      "無",
+      "処理区域内",
+      "処理区域外"
+    )
+  sub_decode_func(int_vector, decode_vector)
+}
+
+# 水道
+decode_suidou <- function(int_vector){
+
+  # デコード定義
+  decode_vector <-
+    c(
+      "無",
+      "水道",
+      "専用水道",
+      "引込可"
+    )
+  sub_decode_func(int_vector, decode_vector)
+}
+
+# ガス
+decode_gas <- function(int_vector){
+
+  # デコード定義
+  decode_vector <-
+    c(
+      "無",
+      "都市ガス",
+      "簡易ガス",
+      "引込可"
+    )
+  sub_decode_func(int_vector, decode_vector)
+}
+
+
+# 事情
+decode_jijyou <- function(int_vector){
+
+  # デコード定義
+  decode_vector <-
+    c(
+      "その他",
+      "買進み",
+      "売急ぎ",
+      "限定価格"
+    )
+  sub_decode_func(int_vector, decode_vector)
+}
+
+
+# 当事者属性
+decode_toujisyazokusei <- function(int_vector){
+
+  # デコード定義
+  decode_vector <-
+    c(
+      "個人",
+      "法人",
+      "業者",
+      "公共"
+    )
+  sub_decode_func(int_vector, decode_vector)
+}
+
+
 # 類型
 decode_ruikei <- function(int_vector){
 
@@ -68,9 +202,11 @@ decode_ruikei <- function(int_vector){
       "その他",
       "更地",
       "底地",
-      "",
+      "借地権",
       "建付地",
-      "貸家建付地"
+      "貸家建付地",
+      "区分地上権",
+      "敷地利用権"
     )
   sub_decode_func(int_vector, decode_vector)
 }
