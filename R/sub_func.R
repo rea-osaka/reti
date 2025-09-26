@@ -5,28 +5,32 @@ make_date_col <- function(date_strings){
 
     # df$取引時点
     # 形式は「平成[0-9]{2}年第[１２３４]四半期」
+    # から2024年第4四半期
+    #「[0-9]{4}年第[1234]四半期」
 
-    ad  <- conv_jc2ad(date_strings)
+    #ad  <- conv_jc2ad(date_strings)
+    ad <- stringr::str_extract(date_strings, "^[0-9]{4}")
+
     qtr <- stringr::str_match(date_strings, "\u7b2c(.)\u56db\u534a\u671f")[,2]
     ans <- numeric(length(ad))
 
     for( i in 1:length(ans)){
-        if(qtr[i] == "\uff11"){
+        if(qtr[i] == "1"){
             ans[i] <- paste0(ad[i],"0101")
         }
-        if(qtr[i] == "\uff12"){
+        if(qtr[i] == "2"){
             ans[i] <- paste0(ad[i],"0401")
         }
-        if(qtr[i] == "\uff13"){
+        if(qtr[i] == "3"){
             ans[i] <- paste0(ad[i],"0701")
         }
-        if(qtr[i] == "\uff14"){
+        if(qtr[i] == "4"){
             ans[i] <- paste0(ad[i],"1001")
         }
     }
 
     ans <- lubridate::ymd(ans)
-    
+
     return(ans)
 }
 
@@ -39,18 +43,29 @@ add_cols_station <- function(df){
     tmp <- as.character(hfs_strings)
 
     # 30分未満の数値を取り出す処理
-    ans <- ifelse(nchar(tmp) > 2, 99, ifelse(tmp == "", NA, tmp))
+    ans <- ifelse(nchar(tmp) > 2, NA, ifelse(tmp == "", NA, tmp))
     hfs <- as.integer(ans)
 
 
     # カテゴリ分けする処理
     ans <- tmp
 
-    #ans <- ifelse(ans =="30分?60分", 30, ans)
-    ans <- ifelse(ans =="30\u5206?60\u5206", 30, ans)
-    ans <- ifelse(ans =="1H?1H30", 60, ans)
-    ans <- ifelse(ans =="1H30?2H", 90, ans)
-    ans <- ifelse(ans =="2H?", 120, ans)
+    #ans <- ifelse(ans =="30分～60分", 30, ans)
+    ans <- ifelse(ans =="30\u5206\uff5e60\u5206", 30, ans)
+
+    #ans <- ifelse(ans =="1H～1H30", 60, ans)
+    ans <- ifelse(ans =="1H\uff5e1H30", 60, ans)
+
+    #ans <- ifelse(ans =="1H30〜2H", 90, ans)
+    #ans <- ifelse(ans =="1H30～2H", 90, ans)
+    #ans <- ifelse(ans =="1H30\u301c2H", 90, ans)
+    ans <- ifelse(ans =="1H30\uff5e2H", 90, ans)
+
+    #ans <- ifelse(ans =="2H〜", 120, ans)
+    #ans <- ifelse(ans =="2H～", 120, ans)
+    #ans <- ifelse(ans =="2H\u301c", 120, ans)
+    ans <- ifelse(ans =="2H\uff5e", 120, ans)
+
     ans <- ifelse(ans =="", NA, ans)
 
     ans <- as.integer(ans)
