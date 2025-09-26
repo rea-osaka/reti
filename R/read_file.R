@@ -22,8 +22,10 @@ reti_read_base <- function(path, timecount = TRUE)
     #############################################################
     # 列名の決定はここで行う
     #############################################################
-    my_col_name <- c("dummy_num",
+    my_col_name <- c(
+                  #"dummy_num",  フォーマット替えで無くなった
                   "\u7a2e\u985e",              # 1  種類
+                  "price_category",            # 1-1価格情報区分
                   "\u5730\u57df",              # 2  地域
                   "code",                      # 3  code
                   "\u770c\u540d",              # 4  県名
@@ -56,8 +58,9 @@ reti_read_base <- function(path, timecount = TRUE)
     #############################################################
     # 列のタイプの決定はここで行う
     #############################################################
-    my_col_type <- readr::cols("c", # 仮の番号
+    my_col_type <- readr::cols(#"c", # 仮の番号
                             "f", # 1  種類
+                            "f", # 1-1  価格情報区分
                             "f", # 2  地域
                             "i", # 3  code
                             "f", # 4  県名
@@ -99,7 +102,8 @@ reti_read_base <- function(path, timecount = TRUE)
                   col_types = my_col_type,
                   locale = readr::locale(encoding = "cp932"))
     df <- dplyr::bind_rows(dfs)
-    df <- df[,-1] #１列目は外す
+    df$`price_category` <- NULL
+    #df <- df[,-1] #１列目は外す
 
     #############################################################
     # 類型がNAの列は初めから外す（栃木のエラーデータ対策）
@@ -113,7 +117,8 @@ reti_read_base <- function(path, timecount = TRUE)
 
     tmptdata <- make_date_col(df[[27]])
     # 27 -> 取引時点
-    df <- dplyr::mutate(df, t_date = tmptdata,
+    df <- dplyr::mutate(df,
+                        t_date = tmptdata,
                         t_year = lubridate::year(tmptdata),
                         t_qtr  = lubridate::quarter(tmptdata)
                         )
