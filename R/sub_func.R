@@ -107,7 +107,7 @@ add_cols_building <- function(df){
     # How old is the building
     ###############################
     # 17 -> 建築年
-    start <- suppressWarnings(lubridate::ymd(paste0(conv_jc2ad(df[[17]]), "0101")))
+    start <- suppressWarnings(lubridate::ymd(paste0(df[[17]], "0101")))
     end <- df$t_date
 
     df <- dplyr::mutate(df,
