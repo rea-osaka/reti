@@ -1,6 +1,6 @@
 Package: reti
 Title: Utility to handle real estate transaction price infomation data 
-Version: 0.5.0.001
+Version: 0.5.1.001
 Authors@R: person("Syunsuke", "Fukuda", email = "ok.xmonad@gmail.com", role = c("aut", "cre"))
 Description: Utility to handle real estate transaction-price infomation data.
 Depends: R (>= 3.5)
